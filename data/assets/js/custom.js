@@ -177,6 +177,8 @@ function callDynamicScriptHF() {
         $("#loadpagecontent").load(page, function() {
             lessonHeaderfooter(page, dataTitle);
             rightAndWrongSelection();
+
+            rightAndWrongSelection2();
         });
         return false;
     });
@@ -322,6 +324,67 @@ function rightAndWrongSelection() {
     });
 }
 
+// Right and wrong questions - only for 2 questions
+function rightAndWrongSelection2() {
+    $('#quizForm2').on('click', 'input[type=radio]', function(){
+        var $radioInputCount = $("#quizForm2 input[type=radio]:checked").length;
+        if($radioInputCount === 2) {
+            $("#answer2").fadeIn().css("display","inline-block");
+            $("#answer2 img").css({"opacity":"1", "transform":"scale(1)"});
+        } else {
+            $("#answer").fadeOut().css("display","none");
+            $("#answer2 img").css({"opacity":"0", "transform":"scale(0.4)"});
+        }
+    });
+
+    $(".resetRadioInput").click(function(){
+        $(".ansaftersubmit").hide();
+        $("#answer2 img").css({"opacity":"0", "transform":"scale(0.4)"});
+        $("#answer2").fadeOut().css("display","none");
+    });
+
+    $("#answer2").click(function (e) {
+        e.preventDefault();
+        //var $classLength = $('.correctans');
+        //alert ($classLength.length);
+        var $radioChecked = $("#quizForm2 input[type=radio]:checked").length;
+        var $correctAns = $("#quizForm2 .correctans:checked").length;
+        if ($radioChecked === 2) {
+            if ($correctAns === 2 && $(".correctans").is(":checked")) {
+                $(".result .goodjob, .transparentbg").css("display", "inline-block");
+                play("data/assets/audio/good-job.mp3");
+                //$('.transparentbg').delay(2000).css("display","none");
+                $(".ansaftersubmit").hide();
+                $(".correctaftersubmit").show();
+                
+            } else {
+                $(".result .tryagain, .transparentbg").css("display", "inline-block");
+                play("data/assets/audio/oops-try-again.mp3");
+                $(".ansaftersubmit").show();
+            }
+        } else {
+            $(".result .tryagain, .transparentbg").css("display", "inline-block");
+            play("data/assets/audio/oops-try-again.mp3");
+        }
+
+        $(document).mouseup(function (e) {
+            var container = $(".tryagain");
+            if (!container.is(e.target) &&
+                container.has(e.target).length === 0) {
+                $(".transparentbg, .result .tryagain").hide();
+                pauseAudio();
+            }
+            var container = $(".goodjob");
+            if (!container.is(e.target) &&
+                container.has(e.target).length === 0) {
+                $(".transparentbg, .result .goodjob").hide();
+                pauseAudio();
+            }
+        });
+    });
+}
+
+
 function fullScreenWindow() {
     $('#fullscreen .requestfullscreen, #fullscreen .exitfullscreen').on('click', function(e){
         e.preventDefault();
@@ -410,7 +473,7 @@ function fullScreenWindowtoc(e) {
 // Load div using next and previous button
 function nextnprev () {
     var divs = $(".lesson>.exercise");
-    var now = 3; // currently shown div
+    var now = 0; // currently shown div
     divs.hide().first().show();
     $(".nextprevbtn .prevbtn a").css({"opacity":"0.7", "cursor":"default"});
     $(".nextprevbtn .actionbtn.prevbtn a:hover").css("transform", "scale(1)");
